@@ -67,6 +67,10 @@ export default function PassionsForm() {
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (selected.length < 3) {
+      setError("Choisis au moins 3 passions pour continuer.");
+      return;
+    }
     try {
       window.localStorage.setItem("findfriends-profile-passions", JSON.stringify(selected));
       setError("");

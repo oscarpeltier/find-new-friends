@@ -52,6 +52,10 @@ export default function DescriptionForm() {
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (description.trim().length < 25) {
+      setError("Ta biographie doit contenir au moins 25 caractères.");
+      return;
+    }
     const personalDraft = getPersonalDraft();
     try {
       window.localStorage.setItem("findfriends-profile-description", JSON.stringify({ description }));
@@ -86,10 +90,11 @@ export default function DescriptionForm() {
               name="description"
               value={description}
               onChange={handleChange}
+              minLength={25}
               maxLength={500}
               rows={7}
               placeholder="Écris quelques lignes pour te présenter…"
-              aria-describedby="description-count"
+              aria-describedby="description-count description-minimum"
             />
             <div className="description-guidance" id="description-example">
               <span className="description-guidance-icon" aria-hidden="true">✦</span>
@@ -108,6 +113,7 @@ export default function DescriptionForm() {
                 <span className="description-local-note">Aide automatique sur cet appareil : ton texte n’est pas envoyé à un service externe.</span>
               </div>
             </div>
+            <p className="description-local-note" id="description-minimum">25 caractères minimum pour continuer.</p>
             <span className="sr-only" id="description-count">{description.length} caractères sur 500</span>
           </section>
           <div className="profile-step-actions">
