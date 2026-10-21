@@ -1,4 +1,4 @@
-.dashboard-page { min-height: 100vh; padding: 0 24px 110px; background: radial-gradient(ellipse at top left, #ead5fa 0, transparent 38%), var(--canvas); }
+.dashboard-page { min-height: 100vh; padding: 0 24px 110px; background: radial-gradient(ellipse at 10% 0%, #d8c2ff80 0, transparent 34%), radial-gradient(ellipse at 90% 15%, #a5c8ff45 0, transparent 32%), var(--canvas); }
 .dashboard-header { display: flex; align-items: center; justify-content: space-between; width: min(100%, 1120px); height: 82px; margin: 0 auto; }
 .dashboard-brand { display: inline-flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; font-size: 19px; font-weight: 800; letter-spacing: -.6px; }
 .dashboard-brand-mark { display: grid; width: 40px; height: 40px; place-items: center; border-radius: 12px; background: var(--primary); color: white; }
@@ -6,20 +6,44 @@
 .dashboard-avatar { display: grid; width: 46px; height: 46px; place-items: center; overflow: hidden; border: 2px solid white; border-radius: 50%; background: #ead5fa; color: var(--tertiary); font-size: 18px; font-weight: 800; box-shadow: 0 0 0 1px #e1d3eb; text-decoration: none; }
 .dashboard-avatar img { width: 100%; height: 100%; object-fit: cover; }
 .dashboard-content { display: grid; gap: 31px; width: min(100%, 1040px); margin: 20px auto 0; }
-.dashboard-welcome { display: flex; align-items: center; justify-content: space-between; gap: 24px; min-height: 205px; padding: 32px 38px; overflow: hidden; border-radius: 20px; background: linear-gradient(115deg, var(--primary), var(--tertiary)); color: white; box-shadow: 0 15px 35px #5a189a24; }
+.dashboard-welcome { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 24px; min-height: 205px; padding: 32px 38px; overflow: hidden; border-radius: 20px; background: var(--brand-gradient); color: white; box-shadow: var(--brand-glow), inset 0 1px 0 #ffffff55; }
+.dashboard-welcome::after { position: absolute; top: -55%; right: -8%; width: 50%; height: 190%; border-radius: 50%; background: radial-gradient(ellipse, #ffffff38 0, #ffffff0d 36%, transparent 70%); content: ""; pointer-events: none; }
+.dashboard-welcome > * { position: relative; z-index: 1; }
 .dashboard-eyebrow { display: block; margin-bottom: 9px; color: var(--primary); font-size: 10px; font-weight: 800; letter-spacing: 1.6px; }
 .dashboard-welcome .dashboard-eyebrow { color: #ead5fa; }
 .dashboard-welcome h1 { margin: 0 0 8px; font-size: clamp(26px, 4vw, 36px); letter-spacing: -1.2px; }
 .dashboard-welcome p { margin: 0; color: #f0e4fa; font-size: 14px; }
-.dashboard-weather { display: flex; flex: 0 0 auto; align-items: center; gap: 15px; min-width: 235px; padding: 16px 20px; border: 1px solid #ffffff38; border-radius: 15px; background: #ffffff18; }
+.dashboard-weather-block { display: grid; flex: 0 0 auto; gap: 8px; min-width: 235px; }
+.dashboard-weather { display: flex; width: 100%; align-items: center; gap: 15px; padding: 16px 20px; border: 1px solid #ffffff38; border-radius: 15px; background: #ffffff18; color: inherit; text-align: left; font: inherit; cursor: pointer; }
+.dashboard-weather:disabled { cursor: default; }
+.dashboard-weather:not(:disabled):hover, .dashboard-weather:not(:disabled):focus-visible { background: #ffffff28; outline: 2px solid #ffffff90; outline-offset: 2px; }
 .dashboard-weather-icon { font-size: 34px; }
-.dashboard-weather div { display: grid; gap: 5px; }
+.dashboard-weather-copy { display: grid; gap: 5px; }
 .dashboard-weather strong { font-size: 13px; }
-.dashboard-weather div span { color: #f0e4fa; font-size: 12px; }
+.dashboard-weather-copy > span { color: #f0e4fa; font-size: 12px; }
+.dashboard-hourly-weather { display: flex; gap: 9px; max-width: min(520px, 80vw); padding: 10px; overflow-x: auto; border: 1px solid #ffffff38; border-radius: 12px; background: #ffffff18; scrollbar-color: #ead5fa transparent; }
+.dashboard-hourly-item { display: grid; flex: 0 0 64px; justify-items: center; gap: 5px; padding: 7px 4px; border-radius: 8px; background: #ffffff14; }
+.dashboard-hourly-item time, .dashboard-hourly-item small { color: #f0e4fa; font-size: 10px; }
+.dashboard-hourly-item > span { font-size: 19px; }
+.dashboard-hourly-item strong { font-size: 13px; }
 .dashboard-section { min-width: 0; }
 .dashboard-section-heading { display: flex; align-items: end; justify-content: space-between; margin-bottom: 14px; }
 .dashboard-section-heading .dashboard-eyebrow { margin-bottom: 4px; }
 .dashboard-section-heading h2 { margin: 0; color: var(--ink); font-size: 21px; letter-spacing: -.5px; }
+.dashboard-create-button { min-height: 42px; padding: 0 15px; border: 1px solid #e2d8eb; border-radius: 8px; background: white; color: var(--primary); font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; transition: background .16s, border-color .16s; }
+.dashboard-create-button:hover, .dashboard-create-button:focus-visible { border-color: var(--violet-bright); background: var(--brand-gradient-soft); box-shadow: 0 4px 12px #7138d81a; outline: none; }
+.dashboard-event-form { display: grid; gap: 14px; margin-bottom: 14px; padding: 20px; border: 1px solid #eee5f5; border-radius: 14px; background: white; box-shadow: 0 6px 22px #5a189a0a; }
+.dashboard-event-form h3 { margin: 0; color: var(--ink); font-size: 16px; }
+.dashboard-event-form label { display: grid; gap: 7px; color: var(--ink); font-size: 12px; font-weight: 700; }
+.dashboard-event-form input { width: 100%; min-height: 43px; padding: 0 11px; border: 1px solid #e2d8eb; border-radius: 7px; color: var(--ink); background: white; font: inherit; font-size: 13px; }
+.dashboard-event-form input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px #7b2cbf18; }
+.dashboard-event-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.dashboard-event-form > p { margin: 0; color: var(--muted); font-size: 11px; }
+.dashboard-activity-list { display: grid; gap: 10px; }
+.dashboard-activity-card { display: flex; align-items: center; gap: 14px; padding: 16px; border: 1px solid #eee5f5; border-radius: 14px; background: white; }
+.dashboard-activity-card > div { flex: 1; min-width: 0; }
+.dashboard-activity-card strong { color: var(--ink); font-size: 14px; }
+.dashboard-activity-card p { margin: 5px 0 0; color: var(--muted); font-size: 12px; }
 .dashboard-empty-state { display: flex; align-items: center; gap: 17px; padding: 20px; border: 1px solid #eee5f5; border-radius: 14px; background: white; box-shadow: 0 6px 22px #5a189a0a; }
 .dashboard-empty-icon { display: grid; flex: 0 0 42px; width: 42px; height: 42px; place-items: center; border-radius: 12px; background: #f4eafd; color: var(--primary); font-size: 21px; }
 .dashboard-empty-state > div { flex: 1; }
@@ -39,7 +63,8 @@
 .dashboard-nav-item { display: grid; min-width: 86px; justify-items: center; gap: 3px; padding: 6px 10px; border-radius: 10px; color: var(--muted); text-decoration: none; transition: background .15s, color .15s; }
 .dashboard-nav-item > span { font-size: 21px; line-height: 1.1; }
 .dashboard-nav-item small { font: inherit; font-size: 10px; font-weight: 600; }
-.dashboard-nav-item:hover, .dashboard-nav-item:focus-visible, .dashboard-nav-item.is-active { background: #f4eafd; color: var(--primary); outline: none; }
+.dashboard-nav-item:hover, .dashboard-nav-item:focus-visible, .dashboard-nav-item.is-active { background: var(--brand-gradient-soft); color: var(--primary); outline: none; }
+.dashboard-nav-item.is-active > span { color: var(--violet-bright); text-shadow: 0 2px 12px #9b5cff55; }
 @media (max-width: 760px) {
   .dashboard-page { padding: 0 14px 92px; }
   .dashboard-header { height: 68px; }
@@ -51,6 +76,11 @@
   .dashboard-welcome p { font-size: 13px; line-height: 1.5; }
   .dashboard-weather { width: 100%; min-width: 0; padding: 12px 15px; }
   .dashboard-section-heading h2 { font-size: 19px; }
+  .dashboard-create-button { min-height: 40px; padding: 0 10px; font-size: 11px; }
+  .dashboard-event-form { padding: 16px; }
+  .dashboard-event-fields { grid-template-columns: 1fr; }
+  .dashboard-activity-card { align-items: flex-start; gap: 10px; padding: 13px; }
+  .dashboard-activity-card strong { font-size: 13px; }
   .dashboard-empty-state { align-items: flex-start; flex-wrap: wrap; gap: 12px; padding: 16px; }
   .dashboard-empty-state > div { flex-basis: calc(100% - 58px); }
   .dashboard-discover-button { width: 100%; }

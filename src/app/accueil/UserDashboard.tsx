@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 
 type Registration = { firstName?: string };
 type Personal = { firstName?: string; city?: string };
 type Weather = { temperature: number; code: number };
+type HourlyWeather = { time: string; temperature: number; code: number };
+type Activity = { id: string; name: string; date: string; time: string; location: string };
 
 function readJson<T>(key: string, fallback: T): T {
   try {
@@ -37,6 +39,7 @@ const navigation = [
   { href: "/accueil", icon: "⌂", label: "Accueil" },
   { href: "/evenements", icon: "⌖", label: "Carte" },
   { href: "/messages", icon: "☏", label: "Messages" },
+  { href: "/amis", icon: "♧", label: "Mes amis" },
   { href: "/profil/creer/rencontres", icon: "◉", label: "Profil" },
   { href: "/parametres", icon: "⚙", label: "Réglages" },
 ];
@@ -45,8 +48,13 @@ export default function UserDashboard() {
   const [profile, setProfile] = useState<{ firstName: string; city: string; photo: string }>({ firstName: "ami·e", city: "", photo: "" });
   const { firstName, city, photo } = profile;
   const [weather, setWeather] = useState<Weather | null>(null);
+  const [hourlyWeather, setHourlyWeather] = useState<HourlyWeather[]>([]);
+  const [showHourlyWeather, setShowHourlyWeather] = useState(false);
   const [weatherLoading, setWeatherLoading] = useState(false);
   const [weatherUnavailable, setWeatherUnavailable] = useState(false);
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [showActivityForm, setShowActivityForm] = useState(false);
+  const [activityError, setActivityError] = useState("");
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -59,6 +67,7 @@ export default function UserDashboard() {
         profilePhoto = "";
       }
       setProfile({ firstName: personal.firstName || registration.firstName || "ami·e", city: personal.city || "", photo: profilePhoto });
+      setActivities(readJson<Activity[]>("findfriends-profile-activities", []));
     }, 0);
     return () => window.clearTimeout(timer);
   }, []);
@@ -75,11 +84,21 @@ export default function UserDashboard() {
         const geo = await geoResponse.json() as { results?: Array<{ latitude: number; longitude: number }> };
         const place = geo.results?.[0];
         if (!place) throw new Error("Ville introuvable");
-        const weatherResponse = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${place.latitude}&longitude=${place.longitude}&current=temperature_2m,weather_code&timezone=auto`, { signal: controller.signal });
+        const weatherResponse = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${place.latitude}&longitude=${place.longitude}&current=temperature_2m,weather_code&hourly=temperature_2m,weather_code&forecast_hours=24&timezone=auto`, { signal: controller.signal });
         if (!weatherResponse.ok) throw new Error("Météo indisponible");
-        const data = await weatherResponse.json() as { current?: { temperature_2m: number; weather_code: number } };
+        const data = await weatherResponse.json() as {
+          current?: { temperature_2m: number; weather_code: number };
+          hourly?: { time: string[]; temperature_2m: number[]; weather_code: number[] };
+        };
         if (!data.current) throw new Error("Météo indisponible");
         setWeather({ temperature: data.current.temperature_2m, code: data.current.weather_code });
+        const hours = data.hourly;
+        if (!hours || hours.time.length === 0) throw new Error("Prévisions horaires indisponibles");
+        setHourlyWeather(hours.time.map((time, index) => ({
+          time,
+          temperature: hours.temperature_2m[index],
+          code: hours.weather_code[index],
+        })).filter((hour) => Number.isFinite(hour.temperature) && Number.isFinite(hour.code)));
       } catch {
         if (!controller.signal.aborted) setWeatherUnavailable(true);
       } finally {
@@ -90,9 +109,31 @@ export default function UserDashboard() {
     return () => controller.abort();
   }, [city]);
 
-  const upcomingActivities: never[] = [];
+  const upcomingActivities = activities;
   const conditions = weather ? weatherLabel(weather.code) : null;
-  const unavailableDestinations = new Set(["/evenements", "/messages", "/profil/qr-code", "/parametres"]);
+  const unavailableDestinations = new Set(["/evenements", "/messages", "/amis", "/profil/qr-code", "/parametres"]);
+
+  function createActivity(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const activity: Activity = {
+      id: `${Date.now()}`,
+      name: String(formData.get("activityName") ?? "").trim(),
+      date: String(formData.get("activityDate") ?? ""),
+      time: String(formData.get("activityTime") ?? ""),
+      location: String(formData.get("activityLocation") ?? "").trim(),
+    };
+    try {
+      const updated = [...activities, activity].sort((a, b) => `${a.date}T${a.time}`.localeCompare(`${b.date}T${b.time}`));
+      window.localStorage.setItem("findfriends-profile-activities", JSON.stringify(updated));
+      event.currentTarget.reset();
+      setActivities(updated);
+      setActivityError("");
+      setShowActivityForm(false);
+    } catch {
+      setActivityError("Impossible d’enregistrer l’activité sur cet appareil.");
+    }
+  }
 
   return (
     <main className="dashboard-page">
@@ -113,17 +154,39 @@ export default function UserDashboard() {
             <h1 id="dashboard-greeting">Bonjour, {firstName} !</h1>
             <p>Prêt·e à faire de nouvelles rencontres aujourd’hui ?</p>
           </div>
-          <div className="dashboard-weather" aria-live="polite">
-            <span className="dashboard-weather-icon" aria-hidden="true">{conditions?.[1] ?? (weatherLoading ? "…" : "🌤️")}</span>
-            <div>
-              {weatherLoading ? <strong>Chargement de la météo…</strong> : weather && conditions ? <><strong>{Math.round(weather.temperature)}°C · {conditions[0]}</strong><span>{city}</span></> : weatherUnavailable ? <><strong>Météo indisponible</strong><span>{city || "Vérifie ta ville dans ton profil"}</span></> : <><strong>Ajoute ta ville</strong><span>pour afficher la météo locale</span></>}
-            </div>
+          <div className="dashboard-weather-block">
+            <button className="dashboard-weather" type="button" aria-live="polite" aria-expanded={showHourlyWeather} aria-controls="dashboard-hourly-weather" disabled={!weather || hourlyWeather.length === 0} onClick={() => setShowHourlyWeather((visible) => !visible)}>
+              <span className="dashboard-weather-icon" aria-hidden="true">{conditions?.[1] ?? (weatherLoading ? "…" : "🌤️")}</span>
+              <span className="dashboard-weather-copy">
+                {weatherLoading ? <strong>Chargement de la météo…</strong> : weather && conditions ? <><strong>{Math.round(weather.temperature)}°C · {conditions[0]}</strong><span>{city} · Voir les prochaines 24 h</span></> : weatherUnavailable ? <><strong>Météo indisponible</strong><span>{city || "Vérifie ta ville dans ton profil"}</span></> : <><strong>Ajoute ta ville</strong><span>pour afficher la météo locale</span></>}
+              </span>
+            </button>
+            {showHourlyWeather && hourlyWeather.length > 0 && (
+              <div className="dashboard-hourly-weather" id="dashboard-hourly-weather" aria-label="Prévisions météo heure par heure">
+                {hourlyWeather.map((hour) => {
+                  const [label, icon] = weatherLabel(hour.code);
+                  const date = new Date(hour.time);
+                  return <div className="dashboard-hourly-item" key={hour.time}><time dateTime={hour.time}>{date.toLocaleString("fr-FR", { hour: "2-digit", minute: "2-digit" })}</time><span aria-hidden="true">{icon}</span><strong>{Math.round(hour.temperature)}°</strong><small>{label}</small></div>;
+                })}
+              </div>
+            )}
           </div>
         </section>
 
         <section className="dashboard-section" aria-labelledby="activities-title">
-          <div className="dashboard-section-heading"><div><span className="dashboard-eyebrow">TES RENDEZ-VOUS</span><h2 id="activities-title">Mes prochaines activités</h2></div></div>
-          {upcomingActivities.length ? <div className="dashboard-activity-list">{upcomingActivities.map((activity) => <article key={activity} />)}</div> : (
+          <div className="dashboard-section-heading"><div><span className="dashboard-eyebrow">TES RENDEZ-VOUS</span><h2 id="activities-title">Mes prochaines activités</h2></div><button className="dashboard-create-button" type="button" onClick={() => { setShowActivityForm((visible) => !visible); setActivityError(""); }}>{showActivityForm ? "Fermer" : "+ Créer un événement"}</button></div>
+          {showActivityForm && (
+            <form className="dashboard-event-form" onSubmit={createActivity}>
+              <h3>Organiser une activité</h3>
+              {activityError && <p className="registration-error" role="alert">{activityError}</p>}
+              <label>Nom de l’activité<input name="activityName" required maxLength={80} placeholder="Ex. : Café entre amis" /></label>
+              <div className="dashboard-event-fields"><label>Date<input name="activityDate" type="date" required min={new Date().toISOString().slice(0, 10)} /></label><label>Heure<input name="activityTime" type="time" required /></label></div>
+              <label>Lieu<input name="activityLocation" required maxLength={100} placeholder="Ex. : Parc de la Tête d’Or, Lyon" /></label>
+              <button className="submit-button" type="submit">Enregistrer l’événement <span aria-hidden="true">→</span></button>
+              <p>Événement enregistré uniquement sur cet appareil, pas encore partagé avec d’autres utilisateurs.</p>
+            </form>
+          )}
+          {upcomingActivities.length ? <div className="dashboard-activity-list">{upcomingActivities.map((activity) => <article className="dashboard-activity-card" key={activity.id}><span className="dashboard-empty-icon" aria-hidden="true">✦</span><div><strong>{activity.name}</strong><p>{activity.date} · {activity.time} · {activity.location}</p></div><span className="dashboard-quick-arrow" aria-hidden="true">→</span></article>)}</div> : (
             <div className="dashboard-empty-state">
               <span className="dashboard-empty-icon" aria-hidden="true">✦</span>
               <div><strong>Tu n’es inscrit·e à aucune activité pour le moment.</strong><p>Explore les sorties près de chez toi et trouve ta prochaine activité.</p></div>
