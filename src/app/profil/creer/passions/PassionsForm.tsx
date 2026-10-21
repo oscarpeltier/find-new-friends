@@ -37,19 +37,9 @@ const passions = [
   { name: "Stand-up et humour", icon: "🎤" },
 ];
 
-function getSavedPassions() {
-  if (typeof window === "undefined") return [];
-  try {
-    const saved = JSON.parse(window.localStorage.getItem("findfriends-profile-passions") ?? "[]") as unknown;
-    return Array.isArray(saved) ? saved.filter((item): item is string => typeof item === "string" && passions.some((passion) => passion.name === item)).slice(0, 10) : [];
-  } catch {
-    return [];
-  }
-}
-
 export default function PassionsForm() {
   const router = useRouter();
-  const [selected, setSelected] = useState<string[]>(getSavedPassions);
+  const [selected, setSelected] = useState<string[]>([]);
   const [showAll, setShowAll] = useState(false);
   const [error, setError] = useState("");
 

@@ -5,15 +5,6 @@ import { useRouter } from "next/navigation";
 import { useState, type ChangeEvent, type FormEvent } from "react";
 
 type PersonalDraft = { city?: string; gender?: string; occupation?: string; languages?: string[] };
-function getSavedDescription() {
-  if (typeof window === "undefined") return "";
-  try {
-    const saved = window.localStorage.getItem("findfriends-profile-description");
-    return saved ? (JSON.parse(saved) as { description?: string }).description ?? "" : "";
-  } catch {
-    return "";
-  }
-}
 
 function getPersonalDraft(): PersonalDraft {
   if (typeof window === "undefined") return {};
@@ -26,7 +17,7 @@ function getPersonalDraft(): PersonalDraft {
 
 export default function DescriptionForm() {
   const router = useRouter();
-  const [description, setDescription] = useState(getSavedDescription);
+  const [description, setDescription] = useState("");
   const [inspiration, setInspiration] = useState("");
   const [error, setError] = useState("");
 

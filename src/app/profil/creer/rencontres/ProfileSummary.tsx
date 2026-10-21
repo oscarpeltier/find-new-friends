@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type TouchEvent } from "react";
 
 type Registration = { firstName?: string; birthDate?: string };
 type PersonalInfo = {
@@ -51,6 +51,20 @@ export default function ProfileSummary() {
   const [passions, setPassions] = useState<string[]>([]);
   const [photos, setPhotos] = useState<string[]>([]);
   const [currentPhoto, setCurrentPhoto] = useState(0);
+  const swipeStartX = useRef<number | null>(null);
+
+  function handleTouchStart(event: TouchEvent<HTMLDivElement>) {
+    swipeStartX.current = event.touches[0]?.clientX ?? null;
+  }
+
+  function handleTouchEnd(event: TouchEvent<HTMLDivElement>) {
+    if (swipeStartX.current === null || photos.length < 2) return;
+    const distance = event.changedTouches[0].clientX - swipeStartX.current;
+    if (Math.abs(distance) > 45) {
+      setCurrentPhoto((index) => (index + (distance < 0 ? 1 : -1) + photos.length) % photos.length);
+    }
+    swipeStartX.current = null;
+  }
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -84,17 +98,21 @@ export default function ProfileSummary() {
             <section className="summary-section">
               <h2>1. Photos de profil</h2>
               {photos.length ? (
-                <div className="photo-book" aria-label="Album photo du profil">
-                  <div className="photo-book-page">
+                <div className="profile-photo-gallery" aria-label="Galerie de photos du profil">
+                  <div className="profile-photo-main" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd} aria-label="Glisse vers la gauche ou la droite pour parcourir les photos">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img key={photos[currentPhoto]} className="photo-book-image" src={photos[currentPhoto]} alt={`Photo de profil ${currentPhoto + 1} sur ${photos.length}`} />
-                    <span className="photo-book-page-number">{currentPhoto + 1} / {photos.length}</span>
+                    <img src={photos[currentPhoto]} alt={`Photo de profil ${currentPhoto + 1} sur ${photos.length}`} />
                   </div>
-                  <div className="photo-book-controls">
-                    <button type="button" onClick={() => setCurrentPhoto((index) => (index - 1 + photos.length) % photos.length)} disabled={photos.length < 2} aria-label="Voir la photo précédente">← Précédente</button>
-                    <span>Tourne la page pour découvrir la suite</span>
-                    <button type="button" onClick={() => setCurrentPhoto((index) => (index + 1) % photos.length)} disabled={photos.length < 2} aria-label="Voir la photo suivante">Suivante →</button>
-                  </div>
+                  {photos.length > 1 && (
+                    <>
+                      <button type="button" className="profile-photo-nav profile-photo-prev" onClick={() => setCurrentPhoto((index) => (index - 1 + photos.length) % photos.length)} aria-label="Photo précédente">‹</button>
+                      <button type="button" className="profile-photo-nav profile-photo-next" onClick={() => setCurrentPhoto((index) => (index + 1) % photos.length)} aria-label="Photo suivante">›</button>
+                      <div className="profile-photo-dots" aria-label={`Photo ${currentPhoto + 1} sur ${photos.length}`}>
+                        {photos.map((photo, index) => <span key={`${photo}-${index}`} className={currentPhoto === index ? "is-active" : ""} />)}
+                      </div>
+                    </>
+                  )}
+                  <span className="profile-photo-count">{currentPhoto + 1} / {photos.length}</span>
                 </div>
               ) : <p className="summary-value">Aucune photo enregistrée</p>}
             </section>
@@ -109,6 +127,7 @@ export default function ProfileSummary() {
                 <div><dt>Profession ou études</dt><dd>{personal.occupation || "Non renseignée"}</dd></div>
                 <div><dt>Langues</dt><dd>{languages.length ? languages.join(", ") : "Non renseignées"}</dd></div>
               </dl>
+              <p className="summary-emphasis">!!</p>
             </section>
 
             <section className="summary-section">
@@ -125,7 +144,7 @@ export default function ProfileSummary() {
 
         <div className="profile-step-actions">
           <Link className="registration-back" href="/profil/creer/passions">← Modifier mes passions</Link>
-          <Link className="submit-button profile-next-button summary-finish-button" href="/">Terminer <span aria-hidden="true">→</span></Link>
+          <Link className="submit-button profile-next-button summary-finish-button" href="/accueil">Terminer <span aria-hidden="true">→</span></Link>
         </div>
       </section>
     </main>
