@@ -78,6 +78,7 @@ export default function UserDashboard() {
   const [selectedAddress, setSelectedAddress] = useState<AddressSuggestion | null>(null);
   const [addressLoading, setAddressLoading] = useState(false);
   const [addressError, setAddressError] = useState("");
+  const [unreadMessages, setUnreadMessages] = useState(0);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -93,6 +94,28 @@ export default function UserDashboard() {
       setActivities(readJson<Activity[]>("findfriends-profile-activities", []));
     }, 0);
     return () => window.clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    const refreshUnreadMessages = () => {
+      try {
+        const settings = readJson<{ notifications?: boolean; messageAlerts?: boolean }>("findfriends-settings-v1", {});
+        const conversations = readJson<Array<{ messages?: Array<{ fromMe?: boolean; read?: boolean }> }>>("findfriends-local-messages-v1", []);
+        setUnreadMessages(settings.notifications !== false && settings.messageAlerts !== false
+          ? conversations.reduce((total, conversation) => total + (conversation.messages ?? []).filter((message) => !message.fromMe && !message.read).length, 0)
+          : 0);
+      } catch { setUnreadMessages(0); }
+    };
+    const timer = window.setTimeout(refreshUnreadMessages, 0);
+    window.addEventListener("storage", refreshUnreadMessages);
+    window.addEventListener("findfriends-messages-updated", refreshUnreadMessages);
+    window.addEventListener("findfriends-settings-updated", refreshUnreadMessages);
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("storage", refreshUnreadMessages);
+      window.removeEventListener("findfriends-messages-updated", refreshUnreadMessages);
+      window.removeEventListener("findfriends-settings-updated", refreshUnreadMessages);
+    };
   }, []);
 
   useEffect(() => {
@@ -158,7 +181,7 @@ export default function UserDashboard() {
 
   const upcomingActivities = activities;
   const conditions = weather ? weatherLabel(weather.code) : null;
-  const unavailableDestinations = new Set(["/evenements", "/messages", "/parametres"]);
+  const unavailableDestinations = new Set(["/evenements"]);
 
   function openActivityEditor(activity: Activity) {
     setEditingActivity(activity);
@@ -346,7 +369,7 @@ export default function UserDashboard() {
         <section className="dashboard-section" aria-labelledby="quick-access-title">
           <div className="dashboard-section-heading"><div><span className="dashboard-eyebrow">TOUT À PORTÉE DE MAIN</span><h2 id="quick-access-title">Accès rapide</h2></div></div>
           <div className="dashboard-quick-grid">
-            {quickLinks.map(({ href, icon, title, description }) => <Link className="dashboard-quick-card" href={href} key={title} aria-label={`${title} (destination provisoire)`}><span className="dashboard-quick-icon" aria-hidden="true">{icon}</span><span className="dashboard-quick-copy"><strong>{title}</strong><span>{description}</span>{unavailableDestinations.has(href) && <small className="dashboard-provisional">Page à venir</small>}</span><span className="dashboard-quick-arrow" aria-hidden="true">→</span></Link>)}
+            {quickLinks.map(({ href, icon, title, description }) => <Link className="dashboard-quick-card" href={href} key={title} aria-label={unavailableDestinations.has(href) ? `${title} (destination provisoire)` : title}><span className="dashboard-quick-icon" aria-hidden="true">{icon}{href === "/messages" && unreadMessages > 0 && <i className="dashboard-unread-badge">{unreadMessages}</i>}</span><span className="dashboard-quick-copy"><strong>{title}{href === "/messages" && unreadMessages > 0 && <span className="dashboard-inline-unread"> · {unreadMessages} non lu{unreadMessages > 1 ? "s" : ""}</span>}</strong><span>{description}</span>{unavailableDestinations.has(href) && <small className="dashboard-provisional">Page à venir</small>}</span><span className="dashboard-quick-arrow" aria-hidden="true">→</span></Link>)}
           </div>
         </section>
       </div>
