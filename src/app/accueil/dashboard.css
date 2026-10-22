@@ -29,6 +29,8 @@
 .dashboard-section { min-width: 0; }
 .dashboard-section-heading { display: flex; align-items: end; justify-content: space-between; margin-bottom: 14px; }
 .dashboard-section-heading .dashboard-eyebrow { margin-bottom: 4px; }
+.dashboard-activities-map-link { display: inline-flex; align-items: center; gap: 5px; margin-top: 7px; color: var(--primary); text-decoration: none; font-size: 12px; font-weight: 700; }
+.dashboard-activities-map-link:hover { text-decoration: underline; }
 .dashboard-section-heading h2 { margin: 0; color: var(--ink); font-size: 21px; letter-spacing: -.5px; }
 .dashboard-create-button { min-height: 42px; padding: 0 15px; border: 1px solid #e2d8eb; border-radius: 8px; background: white; color: var(--primary); font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; transition: background .16s, border-color .16s; }
 .dashboard-create-button:hover, .dashboard-create-button:focus-visible { border-color: var(--violet-bright); background: var(--brand-gradient-soft); box-shadow: 0 4px 12px #7138d81a; outline: none; }
@@ -37,6 +39,15 @@
 .dashboard-event-form label { display: grid; gap: 7px; color: var(--ink); font-size: 12px; font-weight: 700; }
 .dashboard-event-form input { width: 100%; min-height: 43px; padding: 0 11px; border: 1px solid #e2d8eb; border-radius: 7px; color: var(--ink); background: white; font: inherit; font-size: 13px; }
 .dashboard-event-form input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px #7b2cbf18; }
+.dashboard-address-field { position: relative; display: grid; gap: 7px; }
+.dashboard-address-field > label { color: var(--ink); font-size: 12px; font-weight: 700; }
+.dashboard-address-field > small { color: var(--muted); font-size: 11px; line-height: 1.5; }
+.dashboard-address-field .dashboard-address-error { color: #b42318; }
+.dashboard-address-field .dashboard-address-selected { color: #247a45; }
+.dashboard-address-suggestions { position: absolute; z-index: 20; top: calc(100% - 22px); right: 0; left: 0; max-height: 240px; overflow-y: auto; margin: 0; padding: 5px; border: 1px solid #e2d8eb; border-radius: 10px; background: #fff; box-shadow: 0 10px 28px #24143220; list-style: none; }
+.dashboard-address-suggestions li { margin: 0; }
+.dashboard-address-suggestions button { width: 100%; padding: 10px; border: 0; border-radius: 7px; background: white; color: var(--ink); font: inherit; font-size: 12px; line-height: 1.45; text-align: left; cursor: pointer; }
+.dashboard-address-suggestions button:hover, .dashboard-address-suggestions button:focus-visible { outline: none; background: var(--brand-gradient-soft); }
 .dashboard-event-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .dashboard-event-form > p { margin: 0; color: var(--muted); font-size: 11px; }
 .dashboard-activity-list { display: grid; gap: 10px; }
@@ -44,6 +55,10 @@
 .dashboard-activity-card > div { flex: 1; min-width: 0; }
 .dashboard-activity-card strong { color: var(--ink); font-size: 14px; }
 .dashboard-activity-card p { margin: 5px 0 0; color: var(--muted); font-size: 12px; }
+.dashboard-activity-edit { display: grid; width: 38px; height: 38px; flex: 0 0 38px; place-items: center; border: 0; border-radius: 10px; background: var(--brand-gradient-soft); cursor: pointer; }
+.dashboard-activity-edit:hover, .dashboard-activity-edit:focus-visible { background: #eee2ff; outline: 2px solid #9b5cff55; }
+.dashboard-delete-event { min-height: 42px; padding: 9px 16px; border: 1px solid #f1c5c5; border-radius: 8px; background: #fff7f7; color: #b42318; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
+.dashboard-delete-event:hover, .dashboard-delete-event:focus-visible { border-color: #b42318; background: #fff0f0; outline: none; }
 .dashboard-empty-state { display: flex; align-items: center; gap: 17px; padding: 20px; border: 1px solid #eee5f5; border-radius: 14px; background: white; box-shadow: 0 6px 22px #5a189a0a; }
 .dashboard-empty-icon { display: grid; flex: 0 0 42px; width: 42px; height: 42px; place-items: center; border-radius: 12px; background: #f4eafd; color: var(--primary); font-size: 21px; }
 .dashboard-empty-state > div { flex: 1; }
