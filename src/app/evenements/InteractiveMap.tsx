@@ -12,6 +12,8 @@ type ActivityPin = {
   location: string;
   latitude?: number;
   longitude?: number;
+  description?: string;
+  category?: string;
 };
 
 const pinIcon = L.divIcon({
@@ -65,7 +67,21 @@ export default function InteractiveMap() {
         const safeLocation = document.createElement("span");
         safeLocation.textContent = activity.location;
         const marker = L.marker([lat, lon], { icon: pinIcon });
-        marker.bindPopup(`<strong>${safeName.innerHTML}</strong><br>${activity.date} · ${activity.time}<br>${safeLocation.innerHTML}`);
+        const popup = document.createElement("div");
+        const heading = document.createElement("strong");
+        heading.textContent = activity.name;
+        popup.append(heading, document.createElement("br"));
+        const category = document.createElement("span");
+        category.textContent = activity.category ? `${activity.category} · ` : "";
+        popup.append(category, document.createTextNode(`${activity.date} · ${activity.time}`), document.createElement("br"));
+        popup.append(safeLocation);
+        if (activity.description) {
+          const description = document.createElement("p");
+          description.textContent = activity.description;
+          description.style.margin = "6px 0 0";
+          popup.append(description);
+        }
+        marker.bindPopup(popup);
         marker.addTo(markers);
       }
 

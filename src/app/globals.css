@@ -358,8 +358,101 @@ form > input::placeholder { color: #a7a0af; }
 .events-nav-item small { font-size: 9px; font-weight: 600; }
 .events-nav-item.is-active { background: var(--brand-gradient-soft); color: var(--primary); }
 .events-nav-item.is-active small { font-weight: 800; }
+.events-modal-backdrop { position: fixed; z-index: 1000; inset: 0; display: grid; place-items: center; overflow-y: auto; padding: 24px; background: #21152f80; backdrop-filter: blur(5px); }
+.events-create-modal { position: relative; width: min(100%, 650px); max-height: min(90vh, 900px); overflow-y: auto; padding: 30px; border: 1px solid #eee5f5; border-radius: 20px; background: white; box-shadow: 0 24px 70px #1b102b55; }
+.events-modal-close { position: absolute; top: 14px; right: 16px; width: 38px; height: 38px; border: 0; border-radius: 50%; background: var(--brand-gradient-soft); color: var(--primary); font: inherit; font-size: 25px; cursor: pointer; }
+.events-create-modal h2 { margin: 8px 42px 6px 0; font-size: 28px; letter-spacing: -.8px; }
+.events-modal-intro { margin: 0 0 20px; color: var(--muted); font-size: 13px; line-height: 1.6; }
+.events-create-form { display: grid; gap: 14px; }
+.events-create-form > label, .events-form-row > label, .events-address-field > label { display: grid; gap: 7px; color: var(--ink); font-size: 12px; font-weight: 700; }
+.events-create-form input:not([type="radio"]), .events-create-form textarea { width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid #e2d8eb; border-radius: 8px; color: var(--ink); background: white; font: inherit; font-size: 13px; }
+.events-create-form textarea { min-height: 90px; resize: vertical; }
+.events-create-form input:focus, .events-create-form textarea:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px #7b2cbf18; }
+.events-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.events-category-fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
+.events-category-fieldset legend { margin-bottom: 9px; color: var(--ink); font-size: 12px; font-weight: 700; }
+.events-category-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.events-category-option { position: relative; display: flex; min-height: 48px; align-items: center; gap: 7px; padding: 8px; border: 1px solid #e8dfef; border-radius: 9px; background: #fff; color: #51485b; font-size: 10px; font-weight: 600; cursor: pointer; }
+.events-category-option:has(input:checked) { border-color: var(--violet-bright); background: var(--brand-gradient-soft); color: var(--primary); }
+.events-category-option input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.events-category-option:has(input:focus-visible) { outline: 3px solid #9b5cff55; }
+.events-category-option > span:first-of-type { font-size: 18px; }
+.events-address-field { position: relative; display: grid; gap: 7px; }
+.events-address-search { display: flex; gap: 8px; }
+.events-address-search input { flex: 1; min-width: 0; }
+.events-address-search button { padding: 0 14px; border: 0; border-radius: 8px; background: var(--brand-gradient-soft); color: var(--primary); font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
+.events-address-search button:disabled { opacity: .5; cursor: wait; }
+.events-address-results { max-height: 180px; overflow-y: auto; margin: 0; padding: 4px; border: 1px solid #e2d8eb; border-radius: 9px; background: white; list-style: none; box-shadow: 0 8px 22px #24143218; }
+.events-address-results button { width: 100%; padding: 9px; border: 0; border-radius: 6px; background: white; color: var(--ink); font: inherit; font-size: 11px; line-height: 1.45; text-align: left; cursor: pointer; }
+.events-address-results button:hover { background: var(--brand-gradient-soft); }
+.events-address-selected, .events-storage-note { color: var(--muted); font-size: 11px; }
+.events-create-form .submit-button { margin-top: 2px; }
+
+/* Page Ajouter des amis — mode démo local */
+.friends-page { min-height: 100vh; padding-bottom: 88px; background: var(--canvas); }
+.friends-header { display: flex; height: 72px; align-items: center; justify-content: space-between; padding: 0 clamp(20px, 5vw, 76px); border-bottom: 1px solid #eee8f3; background: #fff; }
+.friends-brand { display: inline-flex; align-items: center; gap: 10px; color: var(--ink); font-size: 17px; font-weight: 700; text-decoration: none; }
+.friends-profile-label { color: var(--muted); font-size: 12px; }
+.friends-content { display: grid; width: min(100% - 36px, 900px); gap: 20px; margin: 0 auto; padding: 36px 0 40px; }
+.friends-heading { text-align: center; }
+.friends-heading h1 { margin: 8px 0; font-size: clamp(28px, 4vw, 38px); letter-spacing: -1px; }
+.friends-heading p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.6; }
+.friends-share-card, .friends-enter-card, .friends-requests-section { padding: 24px; border: 1px solid #eee5f5; border-radius: 17px; background: #fff; box-shadow: 0 8px 28px #5a189a0b; }
+.friends-share-card { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 28px; }
+.friends-qr-panel { display: grid; justify-items: center; gap: 10px; text-align: center; }
+.friends-qr-frame { padding: 12px; border: 1px solid #eee5f5; border-radius: 15px; background: white; box-shadow: 0 8px 22px #7138d812; }
+.friends-qr-panel > strong { color: var(--ink); font-size: 14px; }
+.friends-qr-panel > p { max-width: 270px; margin: 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+.friends-invite-panel { display: grid; justify-items: center; gap: 13px; padding: 25px 20px; border-radius: 14px; background: var(--brand-gradient-soft); text-align: center; }
+.friends-invite-code { color: var(--primary); font-size: clamp(28px, 5vw, 40px); font-weight: 800; letter-spacing: 7px; }
+.friends-copy-button { max-width: 260px; }
+.friends-secondary-button { min-height: 42px; padding: 8px 15px; border: 1px solid #d9c9f2; border-radius: 999px; background: white; color: var(--primary); font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
+.friends-secondary-button:hover { background: #f8f3ff; }
+.friends-invite-panel > small { max-width: 260px; color: var(--muted); font-size: 10px; line-height: 1.5; }
+.friends-enter-card { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 20px; }
+.friends-enter-card h2, .friends-section-heading h2 { margin: 5px 0; color: var(--ink); font-size: 20px; letter-spacing: -.4px; }
+.friends-enter-card > div > p { margin: 5px 0 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
+.friends-code-form { display: grid; gap: 9px; }
+.friends-code-form input { width: 100%; height: 46px; padding: 0 13px; border: 1px solid #e2d8eb; border-radius: 8px; outline: none; color: var(--ink); font: inherit; font-size: 15px; letter-spacing: 3px; text-align: center; text-transform: uppercase; }
+.friends-code-form input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px #7b2cbf18; }
+.friends-feedback { grid-column: 1 / -1; margin: 0; color: #247a45; font-size: 12px; }
+.friends-feedback.is-error { color: #b42318; }
+.friends-notice { padding: 12px 15px; border: 1px solid #d9c9f2; border-radius: 10px; background: var(--brand-gradient-soft); color: var(--ink); font-size: 12px; }
+.friends-section-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 13px; }
+.friends-count { display: grid; min-width: 28px; height: 28px; place-items: center; padding: 0 8px; border-radius: 999px; background: var(--brand-gradient-soft); color: var(--primary); font-size: 12px; font-weight: 800; }
+.friends-list { display: grid; gap: 9px; }
+.friends-list-card { display: flex; align-items: center; gap: 11px; padding: 12px; border: 1px solid #eee5f5; border-radius: 11px; background: #fff; }
+.friends-avatar { display: grid; width: 40px; height: 40px; flex: 0 0 40px; place-items: center; border-radius: 50%; background: var(--brand-gradient); color: #fff; font-weight: 800; }
+.friends-list-copy { display: grid; flex: 1; gap: 4px; }
+.friends-list-copy strong { color: var(--ink); font-size: 13px; }
+.friends-list-copy small { color: var(--muted); font-size: 10px; }
+.friends-accept-button, .friends-decline-button { min-height: 36px; padding: 7px 12px; border: 0; border-radius: 999px; font: inherit; font-size: 11px; font-weight: 700; cursor: pointer; }
+.friends-accept-button { background: var(--brand-gradient); color: white; }
+.friends-decline-button { border: 1px solid #e8dfef; background: white; color: var(--muted); }
+.friends-empty { margin: 0; padding: 14px; border-radius: 10px; background: #faf8fc; color: var(--muted); font-size: 12px; text-align: center; }
+.friends-demo-note { width: min(100% - 36px, 900px); margin: -24px auto 25px; color: var(--muted); font-size: 10px; line-height: 1.5; text-align: center; }
 @media (min-width: 761px) { .events-page { height: 100vh; overflow: hidden; } }
 @media (max-width: 760px) {
+  .friends-header { height: 62px; padding: 0 16px; }
+  .friends-brand { font-size: 14px; }
+  .friends-profile-label { font-size: 10px; }
+  .friends-content { width: calc(100% - 24px); gap: 14px; padding: 24px 0 32px; }
+  .friends-heading p { font-size: 12px; }
+  .friends-share-card { grid-template-columns: 1fr; gap: 18px; padding: 17px; }
+  .friends-qr-frame svg { width: 184px; height: 184px; }
+  .friends-invite-panel { padding: 20px 14px; }
+  .friends-enter-card { grid-template-columns: 1fr; gap: 14px; padding: 18px; }
+  .friends-requests-section { padding: 18px; }
+  .friends-list-card { flex-wrap: wrap; }
+  .friends-accept-button, .friends-decline-button { flex: 1; }
+  .friends-demo-note { width: calc(100% - 28px); margin-top: -17px; }
+  .events-modal-backdrop { align-items: start; padding: 10px; }
+  .events-create-modal { max-height: calc(100dvh - 20px); padding: 22px 16px; border-radius: 16px; }
+  .events-create-modal h2 { font-size: 24px; }
+  .events-category-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .events-form-row { grid-template-columns: 1fr 1fr; gap: 9px; }
+  .events-address-search { flex-direction: column; }
+  .events-address-search button { min-height: 40px; }
   .events-header { height: 62px; flex-basis: 62px; padding: 0 16px; }
   .events-brand { font-size: 15px; }
   .events-header-profile { font-size: 11px; }

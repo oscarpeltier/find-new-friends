@@ -9,7 +9,7 @@ type Registration = { firstName?: string };
 type Personal = { firstName?: string; city?: string };
 type Weather = { temperature: number; code: number };
 type HourlyWeather = { time: string; temperature: number; code: number };
-type Activity = { id: string; name: string; date: string; time: string; location: string; latitude?: number; longitude?: number };
+type Activity = { id: string; name: string; date: string; time: string; location: string; latitude?: number; longitude?: number; description?: string; category?: string };
 
 function readJson<T>(key: string, fallback: T): T {
   try {
@@ -33,8 +33,23 @@ function weatherLabel(code: number) {
 const quickLinks = [
   { href: "/evenements", icon: "⌖", title: "Carte des événements", description: "Découvrir des sorties" },
   { href: "/messages", icon: "☏", title: "Messages", description: "Discuter avec mes amis" },
-  { href: "/profil/qr-code", icon: "▦", title: "Mon QR code", description: "Ajouter des amis" },
+  { href: "/amis", icon: "▦", title: "Mon QR code", description: "Ajouter des amis" },
   { href: "/parametres", icon: "⚙", title: "Paramètres", description: "Gérer mon compte" },
+];
+
+const eventCategories = [
+  { name: "Sport", emoji: "⚽" },
+  { name: "Jeux vidéo", emoji: "🎮" },
+  { name: "Cinéma", emoji: "🎬" },
+  { name: "Musique", emoji: "🎵" },
+  { name: "Restaurant", emoji: "🍽️" },
+  { name: "Sorties et soirées", emoji: "🎉" },
+  { name: "Culture", emoji: "🎨" },
+  { name: "Nature et randonnée", emoji: "🌿" },
+  { name: "Voyages", emoji: "✈️" },
+  { name: "Jeux de société", emoji: "🎲" },
+  { name: "Lecture", emoji: "📚" },
+  { name: "Autres activités", emoji: "✨" },
 ];
 
 const navigation = [
@@ -143,7 +158,7 @@ export default function UserDashboard() {
 
   const upcomingActivities = activities;
   const conditions = weather ? weatherLabel(weather.code) : null;
-  const unavailableDestinations = new Set(["/evenements", "/messages", "/amis", "/profil/qr-code", "/parametres"]);
+  const unavailableDestinations = new Set(["/evenements", "/messages", "/parametres"]);
 
   function openActivityEditor(activity: Activity) {
     setEditingActivity(activity);
@@ -168,6 +183,8 @@ export default function UserDashboard() {
       location: selectedAddress?.label ?? "",
       latitude: selectedAddress?.lat,
       longitude: selectedAddress?.lon,
+      description: String(formData.get("activityDescription") ?? "").trim(),
+      category: String(formData.get("activityCategory") ?? ""),
     };
     if (!selectedAddress || !Number.isFinite(selectedAddress.lat) || !Number.isFinite(selectedAddress.lon)) {
       setActivityError("Choisis une adresse dans les suggestions avant d’enregistrer l’événement.");
@@ -259,6 +276,19 @@ export default function UserDashboard() {
               {activityError && <p className="registration-error" role="alert">{activityError}</p>}
               <label>Nom de l’événement<input name="activityName" required maxLength={80} defaultValue={editingActivity?.name ?? ""} placeholder="Ex. : Café entre amis" /></label>
               <div className="dashboard-event-fields"><label>Date<input name="activityDate" type="date" required min={new Date().toISOString().slice(0, 10)} defaultValue={editingActivity?.date ?? ""} /></label><label>Heure<input name="activityTime" type="time" required defaultValue={editingActivity?.time ?? ""} /></label></div>
+              <label>Description<textarea className="dashboard-event-description" name="activityDescription" rows={4} maxLength={1000} defaultValue={editingActivity?.description ?? ""} placeholder="Décris ton événement et donne envie aux autres de participer…" /></label>
+              <fieldset className="dashboard-category-fieldset">
+                <legend>Type d’événement</legend>
+                <div className="dashboard-category-grid">
+                  {eventCategories.map(({ name, emoji }) => (
+                    <label className="dashboard-category-option" key={name}>
+                      <input type="radio" name="activityCategory" value={name} required defaultChecked={editingActivity?.category === name} />
+                      <span className="dashboard-category-emoji" aria-hidden="true">{emoji}</span>
+                      <span>{name}</span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
               <div className="dashboard-address-field">
                 <label htmlFor="activityLocation">Lieu de l’événement</label>
                 <input
@@ -304,7 +334,7 @@ export default function UserDashboard() {
               <p>Événement enregistré uniquement sur cet appareil, pas encore partagé avec d’autres utilisateurs.</p>
             </form>
           )}
-          {upcomingActivities.length ? <div className="dashboard-activity-list">{upcomingActivities.map((activity) => <article className="dashboard-activity-card" key={activity.id}><span className="dashboard-empty-icon" aria-hidden="true">✦</span><div><strong>{activity.name}</strong><p>{activity.date} · {activity.time} · {activity.location}</p></div><button className="dashboard-quick-arrow dashboard-activity-edit" type="button" aria-label={`Modifier ${activity.name}`} onClick={() => openActivityEditor(activity)}>→</button></article>)}</div> : (
+          {upcomingActivities.length ? <div className="dashboard-activity-list">{upcomingActivities.map((activity) => <article className="dashboard-activity-card" key={activity.id}><span className="dashboard-empty-icon" aria-hidden="true">✦</span><div><strong>{activity.name}</strong><p>{activity.date} · {activity.time} · {activity.location}</p>{activity.category && <small className="dashboard-activity-category">{eventCategories.find((category) => category.name === activity.category)?.emoji} {activity.category}</small>}{activity.description && <p className="dashboard-activity-description">{activity.description}</p>}</div><button className="dashboard-quick-arrow dashboard-activity-edit" type="button" aria-label={`Modifier ${activity.name}`} onClick={() => openActivityEditor(activity)}>→</button></article>)}</div> : (
             <div className="dashboard-empty-state">
               <span className="dashboard-empty-icon" aria-hidden="true">✦</span>
               <div><strong>Tu n’es inscrit·e à aucun événement pour le moment.</strong><p>Explore les sorties près de chez toi et trouve ton prochain événement.</p></div>
